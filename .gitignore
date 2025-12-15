@@ -45,7 +45,7 @@ backend/logs/
 
 # Data storage
 data/
-*.json
+backend/data/*.json
 backend/data/
 
 # OS
