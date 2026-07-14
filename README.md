@@ -1,201 +1,98 @@
-# TalentScout – AI Hiring Assistant
+# TalentScout AI — conversational hiring assistant
 
-Modern full-stack web application for collecting candidate information and generating tailored technical questions through an AI-assisted chat experience.
+A full-stack application that collects candidate context through chat and produces tailored technical questions. It is designed as a focused product prototype: a recruiter-friendly flow in React and a FastAPI service that validates candidate data and orchestrates LLM-backed question generation.
 
-## 🌟 Features
-- Conversational UI with typing indicators and progress steps
-- Guided question list plus freeform chat
-- Privacy banner and consent notice
-- Generated technical questions tailored to the candidate
-- Responsive layout with shadcn/ui + Tailwind
-- FastAPI backend with LLM integration
+> **Status:** Active prototype. Do not use with real candidate data until authentication, data retention, consent records, and access controls are implemented.
 
-## 🛠️ Tech Stack
+## Why it matters
 
-### Frontend
-- React + TypeScript (Vite)
-- shadcn/ui components + Tailwind CSS
-- React Query for API state management
-- Custom hooks and form validation
+Candidate screening is often repetitive and inconsistent. TalentScout turns a structured intake—role, experience, stack, location, and preferences—into a consistent conversation and a targeted technical-question set.
 
-### Backend
-- Python FastAPI
-- LLM integration for intelligent question generation
-- Session management
-- RESTful API
+## Architecture
 
-## 📁 Project Structure
+```mermaid
+flowchart LR
+  U[Candidate or recruiter] --> W[React + TypeScript client]
+  W -->|REST| A[FastAPI API]
+  A --> V[Input validation & conversation state]
+  V --> L[LLM provider]
+  V --> Q[Question bank / fallback generation]
+  A --> S[Session storage]
 ```
-hiringbot/
-├── frontend/           # React TypeScript frontend
-│   ├── src/
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   ├── lib/
-│   │   ├── pages/
-│   │   └── types/
-│   ├── public/
-│   └── package.json
-├── backend/            # Python FastAPI backend
-│   ├── api.py
-│   ├── core/
-│   ├── tests/
+
+## Features
+
+- Conversational candidate intake with progress feedback
+- Field-level validation for contact and professional information
+- LLM-assisted, role-aware technical-question generation
+- Deterministic fallback question bank
+- Responsive React interface built with TypeScript and Tailwind
+
+## Repository layout
+
+```text
+talentbot-ai/
+├── backend/
+│   ├── api.py              # FastAPI entrypoint and API contracts
+│   ├── core/               # config, prompts, validation, LLM and storage
+│   ├── tests/              # backend tests
 │   └── requirements.txt
-├── netlify.toml        # Netlify deployment config
-├── DEPLOYMENT.md       # Deployment instructions
-└── package.json        # Root scripts
+├── frontend/
+│   ├── src/                # React application
+│   └── package.json
+├── DEPLOYMENT.md
+└── netlify.toml
 ```
 
-## 🚀 Getting Started
+## Run locally
 
 ### Prerequisites
+
 - Node.js 18+
-- Python 3.9+
-- npm or yarn
+- Python 3.10+
 
-### Installation
+### Setup
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/riteshdhobale/talentbot-ai.git
-   cd talentbot-ai
-   ```
-
-2. **Install Frontend Dependencies**
-   ```bash
-   cd frontend
-   npm install
-   ```
-
-3. **Install Backend Dependencies**
-   ```bash
-   cd ../backend
-   pip install -r requirements.txt
-   ```
-
-4. **Environment Setup**
-   
-   Frontend (optional):
-   ```bash
-   cd frontend
-   cp .env.example .env
-   # Edit .env if needed
-   ```
-
-   Backend:
-   ```bash
-   cd backend
-   cp env.example .env
-   # Edit .env with your API keys
-   ```
-
-### 🏃 Running the Application
-
-#### Option 1: Run Both (Frontend + Backend)
 ```bash
-# From project root
+git clone https://github.com/riteshdhobale/talentbot-ai.git
+cd talentbot-ai
+
+npm run install:all
+
+# Configure secrets locally; never commit this file.
+cp backend/env.example backend/.env
+```
+
+Add the required LLM provider settings to `backend/.env`, then start both services:
+
+```bash
 npm run dev
 ```
 
-#### Option 2: Run Separately
+- Frontend: `http://localhost:5173`
+- API: `http://localhost:8000`
+- Interactive API docs: `http://localhost:8000/docs`
 
-**Backend:**
-```bash
-cd backend
-python api.py
-```
-Runs on http://localhost:8000
-
-**Frontend:**
-```bash
-cd frontend
-npm run dev
-```
-Runs on http://localhost:5173
-
-### 🏗️ Building for Production
+## Quality checks
 
 ```bash
-# Build frontend
-cd frontend
-npm run build
-```
-Output: `frontend/dist/`
+# Frontend
+cd frontend && npm run lint && npm run build
 
-## 📦 Deployment
-
-See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for complete deployment instructions.
-
-### Quick Deploy to Netlify
-
-1. Push to GitHub
-2. Connect repository to Netlify
-3. Configuration is already set in `netlify.toml`
-4. Deploy!
-
-**Build Settings:**
-- Base directory: `frontend`
-- Build command: `npm install && npm run build`
-- Publish directory: `frontend/dist`
-
-## 🧪 Testing
-
-```bash
-# Backend tests
-cd backend
-pytest
-
-# Frontend tests (add your test setup)
-cd frontend
-npm test
+# Backend
+cd ../backend && python -m pytest
 ```
 
-## 📜 Available Scripts
+GitHub Actions validates the frontend lint/build and Python syntax on pushes and pull requests.
 
-### Root
-- `npm run dev` — Run both frontend and backend
-- `npm run build` — Build frontend for production
-- `npm run install:all` — Install all dependencies
+## Privacy and responsible use
 
-### Frontend
-- `npm run dev` — Start Vite dev server
-- `npm run build` — Production build
-- `npm run preview` — Preview production build
-- `npm run lint` — Lint code
+This product handles personally identifiable candidate information. Before a production deployment, add explicit consent capture, authenticated roles, encrypted persistence, deletion/export workflows, retention limits, audit logs, and a reviewed privacy policy.
 
-### Backend
-- `python api.py` — Start FastAPI server
+## Next high-impact feature
 
-## 🔑 Environment Variables
+Add a **structured evaluation workspace**: rubric-based scoring with evidence citations from the conversation, recruiter review/override, and bias checks. This would make TalentScout more than an intake chatbot—it would demonstrate responsible AI workflow design.
 
-### Frontend
-- `VITE_API_BASE_URL` — Backend API URL (default: http://localhost:8000)
+## License
 
-### Backend
-- See `backend/env.example` for required variables
-
-## 📚 Documentation
-
-- [API Documentation](./API_DOCS.md)
-- [Deployment Guide](./DEPLOYMENT.md)
-- [Quick Start](./QUICK_START.md)
-- [Project Summary](./PROJECT_SUMMARY.md)
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-MIT
-
-## 👨‍💻 Author
-Ritesh Dhobale - [@riteshdhobale](https://github.com/riteshdhobale)
-
----
-
-**Status:** ✅ Ready for deployment
-
+Add a license before accepting external contributions.
