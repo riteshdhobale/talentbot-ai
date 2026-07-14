@@ -1,97 +1,152 @@
-# TalentScout AI — conversational hiring assistant
+# TalentScout AI
 
-A full-stack application that collects candidate context through chat and produces tailored technical questions. It is designed as a focused product prototype: a recruiter-friendly flow in React and a FastAPI service that validates candidate data and orchestrates LLM-backed question generation.
+Conversational hiring assistant that collects candidate context, validates key details, and generates role-specific technical questions through a full-stack AI workflow.
 
-> **Status:** Active prototype. Do not use with real candidate data until authentication, data retention, consent records, and access controls are implemented.
+TalentScout is designed as a recruiter-friendly screening product: React handles the guided chat experience, FastAPI manages candidate sessions and validation, and the AI layer turns a candidate's role, experience, and tech stack into targeted technical questions.
 
 ## Why it matters
 
-Candidate screening is often repetitive and inconsistent. TalentScout turns a structured intake—role, experience, stack, location, and preferences—into a consistent conversation and a targeted technical-question set.
+Early hiring screens are repetitive, inconsistent, and often poorly documented. TalentScout turns the process into a structured conversation with reusable candidate context and generated interview questions.
+
+## Current capabilities
+
+- Conversational candidate intake with progress feedback.
+- Field-level validation for contact and professional information.
+- LLM-assisted technical-question generation.
+- Deterministic fallback question bank when AI generation is unavailable.
+- React + TypeScript frontend with Tailwind and shadcn/ui.
+- FastAPI backend with prompt, validation, storage, and LLM modules.
+- GitHub Actions for frontend lint/build and backend syntax checks.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  U[Candidate or recruiter] --> W[React + TypeScript client]
-  W -->|REST| A[FastAPI API]
-  A --> V[Input validation & conversation state]
-  V --> L[LLM provider]
-  V --> Q[Question bank / fallback generation]
-  A --> S[Session storage]
+  candidate["Candidate"] --> ui["React + TypeScript UI"]
+  recruiter["Recruiter"] --> ui
+  ui -->|"REST API"| api["FastAPI backend"]
+  api --> validators["Field validators"]
+  api --> session["Session state"]
+  api --> prompts["Prompt templates"]
+  prompts --> llm["LLM provider"]
+  llm --> questions["Generated technical questions"]
+  validators --> api
+  session --> api
+  questions --> api
+  api --> ui
 ```
 
-## Features
+## Tech stack
 
-- Conversational candidate intake with progress feedback
-- Field-level validation for contact and professional information
-- LLM-assisted, role-aware technical-question generation
-- Deterministic fallback question bank
-- Responsive React interface built with TypeScript and Tailwind
+| Layer | Tools |
+| --- | --- |
+| Frontend | React, TypeScript, Vite, Tailwind, shadcn/ui, React Query |
+| Backend | Python, FastAPI, Pydantic |
+| AI | LLM provider abstraction, prompt templates, question generation |
+| Quality | GitHub Actions, frontend lint/build, backend compile check |
 
-## Repository layout
+## Repository structure
 
 ```text
 talentbot-ai/
 ├── backend/
 │   ├── api.py              # FastAPI entrypoint and API contracts
-│   ├── core/               # config, prompts, validation, LLM and storage
-│   ├── tests/              # backend tests
+│   ├── core/               # config, prompts, validation, LLM, storage
+│   ├── tests/              # backend tests/checks
 │   └── requirements.txt
 ├── frontend/
 │   ├── src/                # React application
 │   └── package.json
+├── .github/workflows/ci.yml
+├── API_DOCS.md
 ├── DEPLOYMENT.md
+├── QUICK_START.md
 └── netlify.toml
 ```
 
-## Run locally
+## Quick start
 
 ### Prerequisites
 
-- Node.js 18+
-- Python 3.10+
+- Node.js 20+
+- Python 3.11+
+- npm
+- Your own LLM provider key for live AI generation
 
-### Setup
+### Install
 
 ```bash
 git clone https://github.com/riteshdhobale/talentbot-ai.git
 cd talentbot-ai
-
 npm run install:all
+```
 
-# Configure secrets locally; never commit this file.
+### Configure
+
+```bash
 cp backend/env.example backend/.env
 ```
 
-Add the required LLM provider settings to `backend/.env`, then start both services:
+Add local settings and API keys to `backend/.env`. Do not commit real secrets.
+
+### Run locally
 
 ```bash
 npm run dev
 ```
 
-- Frontend: `http://localhost:5173`
-- API: `http://localhost:8000`
-- Interactive API docs: `http://localhost:8000/docs`
+Frontend: `http://localhost:5173`
+
+API: `http://localhost:8000`
+
+API docs: `http://localhost:8000/docs`
 
 ## Quality checks
 
 ```bash
-# Frontend
-cd frontend && npm run lint && npm run build
-
-# Backend
-cd ../backend && python -m pytest
+cd frontend
+npm run lint
+npm run build
 ```
 
-GitHub Actions validates the frontend lint/build and Python syntax on pushes and pull requests.
+```bash
+cd backend
+python -m compileall -q .
+```
+
+GitHub Actions runs these checks on push and pull request.
 
 ## Privacy and responsible use
 
-This product handles personally identifiable candidate information. Before a production deployment, add explicit consent capture, authenticated roles, encrypted persistence, deletion/export workflows, retention limits, audit logs, and a reviewed privacy policy.
+TalentScout handles candidate information, so a production version needs authentication, consent capture, encrypted persistence, deletion/export workflows, retention limits, audit logs, and clear access controls.
 
-## Next high-impact feature
+## High-impact next feature
 
-Add a **structured evaluation workspace**: rubric-based scoring with evidence citations from the conversation, recruiter review/override, and bias checks. This would make TalentScout more than an intake chatbot—it would demonstrate responsible AI workflow design.
+Add a recruiter review dashboard:
+
+- Candidate summary cards.
+- Generated questions grouped by skill.
+- Difficulty labels and expected answer hints.
+- Recruiter review and override workflow.
+- Export to PDF or email.
+- Persistent session storage with admin-only access.
+
+That would move TalentScout from a strong AI demo into a usable hiring workflow product.
+
+## Roadmap
+
+- [ ] Add persistent storage for candidate sessions.
+- [ ] Add authentication and recruiter roles.
+- [ ] Add frontend screenshots and a demo GIF.
+- [ ] Add backend tests for validators and session flow.
+- [ ] Add an evaluation set for generated question quality.
+- [ ] Deploy frontend and backend with documented environment variables.
+
+## Documentation
+
+- [API Documentation](./API_DOCS.md)
+- [Deployment Guide](./DEPLOYMENT.md)
+- [Quick Start](./QUICK_START.md)
 
 ## License
 
